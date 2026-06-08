@@ -13,13 +13,19 @@ def email_already_registered(email: str) -> bool:
 
 
 def register_participant(name: str, phone: str, email: str) -> str:
-    resp = (
-        get_client()
-        .table("participants")
-        .insert({"name": name, "phone": phone, "email": email})
-        .execute()
-    )
-    return resp.data[0]["id"]
+    try:
+        resp = (
+            get_client()
+            .table("participants")
+            .insert({"name": name, "phone": phone, "email": email})
+            .execute()
+        )
+        return resp.data[0]["id"]
+    except Exception as exc:
+        msg = str(exc)
+        if "23505" in msg or "duplicado" in msg.lower() or "duplicate" in msg.lower():
+            raise ValueError("Este e-mail já está cadastrado.") from exc
+        raise
 
 
 def save_picks(participant_id: str, picks: dict[str, tuple[str, str]]) -> None:

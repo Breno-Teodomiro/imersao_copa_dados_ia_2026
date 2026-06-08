@@ -135,8 +135,10 @@ def submit_registration() -> None:
         st.session_state.participant_name = name
         st.session_state.error = None
         st.session_state.step = 2
-    except Exception as exc:
-        st.session_state.error = f"Erro ao registrar: {exc}"
+    except ValueError as exc:
+        st.session_state.error = str(exc)
+    except Exception:
+        st.session_state.error = "Erro ao conectar com o servidor. Tente novamente."
 
 
 def render_step1() -> None:
