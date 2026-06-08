@@ -1,0 +1,17 @@
+[theme]
+base = "light"
+primaryColor = "#006400"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F0F7F0"
+textColor = "#1A1A1A"
+borderColor = "#C8DCC8"
+linkColor = "#006400"
+baseRadius = "medium"
+showWidgetBorder = true
+
+greenColor = "#006400"
+greenBackgroundColor = "#E8F5E9"
+greenTextColor = "#004D00"
+
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+baseFontSize = 15
