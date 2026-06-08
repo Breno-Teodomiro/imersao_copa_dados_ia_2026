@@ -41,3 +41,18 @@ def save_picks(participant_id: str, picks: dict[str, tuple[str, str]]) -> None:
     get_client().table("picks").upsert(
         rows, on_conflict="participant_id,group_code"
     ).execute()
+
+
+def save_knockout_picks(participant_id: str, round_name: str, winners: list[str]) -> None:
+    rows = [
+        {
+            "participant_id": participant_id,
+            "round": round_name,
+            "match_index": i,
+            "winner": winner,
+        }
+        for i, winner in enumerate(winners)
+    ]
+    get_client().table("knockout_picks").upsert(
+        rows, on_conflict="participant_id,round,match_index"
+    ).execute()

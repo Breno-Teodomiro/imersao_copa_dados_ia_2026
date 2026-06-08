@@ -1,17 +1,28 @@
 [theme]
-base = "light"
-primaryColor = "#006400"
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#F0F7F0"
-textColor = "#1A1A1A"
-borderColor = "#C8DCC8"
-linkColor = "#006400"
-baseRadius = "medium"
+base = "dark"
+primaryColor = "#00D46A"
+backgroundColor = "#0A0E1A"
+secondaryBackgroundColor = "#141824"
+textColor = "#E8ECF0"
+borderColor = "#2A3040"
+linkColor = "#00D46A"
+baseRadius = "large"
 showWidgetBorder = true
 
-greenColor = "#006400"
-greenBackgroundColor = "#E8F5E9"
-greenTextColor = "#004D00"
+greenColor = "#00D46A"
+greenBackgroundColor = "#003D20"
+greenTextColor = "#00FF80"
 
-font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+yellowColor = "#FFB800"
+yellowBackgroundColor = "#3D2E00"
+yellowTextColor = "#FFD54F"
+
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
 baseFontSize = 15
+headingFontWeights = [800, 700, 700, 600, 600, 500]
+
+[theme.sidebar]
+backgroundColor = "#0D1120"
+secondaryBackgroundColor = "#141824"
+textColor = "#E8ECF0"
+borderColor = "#2A3040"
