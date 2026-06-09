@@ -57,9 +57,14 @@ ROUND_LABELS = {
 
 # ── Helpers de bandeira ───────────────────────────────────────────────────────
 
+# flagcdn.com serve bandeiras apenas em larguras fixas
+_FLAG_WIDTHS = [20, 40, 80, 160, 320, 640, 1280, 2560]
+
+
 def flag_url(team: str, w: int = 40) -> str:
     code = CODES.get(team, "un")
-    return f"https://flagcdn.com/w{w}/{code}.png"
+    src_w = next((x for x in _FLAG_WIDTHS if x >= w), _FLAG_WIDTHS[-1])
+    return f"https://flagcdn.com/w{src_w}/{code}.png"
 
 
 def flag_img(team: str, w: int = 40) -> str:
