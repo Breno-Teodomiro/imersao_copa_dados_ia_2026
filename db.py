@@ -1,3 +1,5 @@
+from collections import Counter
+
 import streamlit as st
 from supabase import create_client, Client
 
@@ -56,3 +58,20 @@ def save_knockout_picks(participant_id: str, round_name: str, winners: list[str]
     get_client().table("knockout_picks").upsert(
         rows, on_conflict="participant_id,round,match_index"
     ).execute()
+
+
+def get_champion_votes() -> tuple[list[tuple[str, int]], int]:
+    """Ranking das seleções mais escolhidas como campeãs no bolão.
+
+    Retorna ([(seleção, votos), ...] ordenado desc, total de bolões finalizados).
+    """
+    resp = (
+        get_client()
+        .table("knockout_picks")
+        .select("winner")
+        .eq("round", "final")
+        .execute()
+    )
+    counts = Counter(r["winner"] for r in resp.data)
+    total = sum(counts.values())
+    return counts.most_common(), total

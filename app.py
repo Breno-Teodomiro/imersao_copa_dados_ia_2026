@@ -1,4 +1,5 @@
 import random
+import pandas as pd
 import streamlit as st
 import db
 
@@ -556,6 +557,83 @@ def reset_state() -> None:
     st.session_state.step = 1
 
 
+def _podium_card(rank: int, team: str, votes: int, total: int,
+                 height: int, color: str, medal: str) -> str:
+    pct = round(votes / total * 100) if total else 0
+    return f"""
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;">
+        <div style="font-size:2rem;line-height:1;">{medal}</div>
+        <div style="margin-top:6px;">{flag_img(team, 80)}</div>
+        <div style="font-weight:800;color:#fff;margin-top:8px;text-align:center;font-size:0.95rem;">{team}</div>
+        <div style="color:#A0AEC0;font-size:0.8rem;margin-bottom:8px;">{votes} voto(s) · {pct}%</div>
+        <div style="width:100%;height:{height}px;border-radius:14px 14px 0 0;
+             background:linear-gradient(180deg,{color}40,{color}10);
+             border:1px solid {color};border-bottom:none;
+             display:flex;align-items:flex-start;justify-content:center;padding-top:10px;
+             font-weight:900;font-size:1.5rem;color:{color};">{rank}º</div>
+    </div>
+    """
+
+
+def render_ranking() -> None:
+    """Pódio top 3 + planilha com o ranking de campeões do bolão."""
+    try:
+        votes, total = db.get_champion_votes()
+    except Exception:
+        return  # falha de rede não deve quebrar a confirmação
+
+    if not votes:
+        return
+
+    st.space("large")
+    st.subheader(":material/leaderboard: Ranking do bolão — seleções mais escolhidas")
+    st.caption(f"Baseado em **{total}** bolão(ões) finalizado(s) por todos os participantes.")
+    st.space("small")
+
+    # Pódio (ordem visual: 2º, 1º, 3º)
+    styles = {
+        1: (120, "#FFB800", "🥇"),
+        2: (88, "#C0C8D4", "🥈"),
+        3: (64, "#CD7F32", "🥉"),
+    }
+    top3 = votes[:3]
+    cards = {rank + 1: _podium_card(rank + 1, t, c, total, *styles[rank + 1])
+             for rank, (t, c) in enumerate(top3)}
+
+    order = [2, 1, 3] if len(cards) == 3 else ([1, 2] if len(cards) == 2 else [1])
+    podium_html = "".join(cards[r] for r in order if r in cards)
+    st.html(
+        f'<div style="display:flex;align-items:flex-end;gap:16px;max-width:620px;'
+        f'margin:0 auto;">{podium_html}</div>'
+    )
+
+    st.space("medium")
+
+    # Planilha completa (já aberta por padrão, pode fechar)
+    with st.expander(":material/table_chart: Ranking completo (planilha)", expanded=True):
+        df = pd.DataFrame(
+            {
+                "Bandeira": [flag_url(t, 40) for t, _ in votes],
+                "Seleção": [t for t, _ in votes],
+                "Votos": [c for _, c in votes],
+                "% do bolão": [round(c / total * 100) if total else 0 for _, c in votes],
+            }
+        )
+        st.dataframe(
+            df,
+            hide_index=True,
+            width="stretch",
+            column_config={
+                "Bandeira": st.column_config.ImageColumn("Bandeira", width="small"),
+                "Seleção": st.column_config.TextColumn("Seleção", width="medium"),
+                "Votos": st.column_config.NumberColumn("Votos", width="small"),
+                "% do bolão": st.column_config.ProgressColumn(
+                    "% do bolão", format="%d%%", min_value=0, max_value=100
+                ),
+            },
+        )
+
+
 def render_confirmation() -> None:
     render_hero()
     render_steps(8)
@@ -576,27 +654,31 @@ def render_confirmation() -> None:
                 Seu campeão: {champion} 🏆</p>
         </div>
         """)
-        st.space("large")
 
-        with st.expander(":material/list: Ver resumo dos meus palpites", expanded=False):
-            picks = st.session_state.group_picks
-            st.markdown("**Fase de grupos**")
-            cols = st.columns(4, gap="small")
-            for i, (g, (f_team, s_team)) in enumerate(picks.items()):
-                with cols[i % 4]:
-                    st.html(
-                        f'<div style="padding:8px 0;"><strong>Grupo {g}</strong><br>'
-                        f'<span style="font-size:0.85rem;color:#A0AEC0;">'
-                        f'{flag_img(f_team, 24)} {f_team}<br>{flag_img(s_team, 24)} {s_team}</span></div>'
-                    )
-            champ = st.session_state.get("champion", "?")
-            st.markdown("**Trajetória final**")
-            st.html(
-                f'<div style="color:#A0AEC0;font-size:0.9rem;">'
-                f'Campeão escolhido: {flag_img(champ, 28)} <strong style="color:#00D46A;">{champ}</strong></div>'
-            )
+    # Ranking do bolão (pódio top 3 + planilha completa)
+    render_ranking()
 
-        st.space("medium")
+    st.space("large")
+    with st.expander(":material/list: Ver resumo dos meus palpites", expanded=False):
+        picks = st.session_state.group_picks
+        st.markdown("**Fase de grupos**")
+        cols = st.columns(4, gap="small")
+        for i, (g, (f_team, s_team)) in enumerate(picks.items()):
+            with cols[i % 4]:
+                st.html(
+                    f'<div style="padding:8px 0;"><strong>Grupo {g}</strong><br>'
+                    f'<span style="font-size:0.85rem;color:#A0AEC0;">'
+                    f'{flag_img(f_team, 24)} {f_team}<br>{flag_img(s_team, 24)} {s_team}</span></div>'
+                )
+        champ = st.session_state.get("champion", "?")
+        st.markdown("**Trajetória final**")
+        st.html(
+            f'<div style="color:#A0AEC0;font-size:0.9rem;">'
+            f'Campeão escolhido: {flag_img(champ, 28)} <strong style="color:#00D46A;">{champ}</strong></div>'
+        )
+
+    st.space("medium")
+    with st.container(horizontal_alignment="center"):
         st.button(":material/refresh: Fazer novo bolão", on_click=reset_state)
 
 
