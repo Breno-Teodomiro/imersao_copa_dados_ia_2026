@@ -1,12 +1,39 @@
+import os
 from collections import Counter
 
 import streamlit as st
 from supabase import create_client, Client
 
+# Carrega variáveis do .env localmente (ignorado pelo git).
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except ImportError:
+    pass
+
+
+def _credential(key: str) -> str:
+    """Lê uma credencial com prioridade: variável de ambiente (.env) -> st.secrets.
+
+    Permite usar .env no desenvolvimento local e o painel de Secrets no
+    Streamlit Cloud sem alterar o código.
+    """
+    value = os.environ.get(key)
+    if value:
+        return value
+    try:
+        return st.secrets[key]
+    except Exception as exc:
+        raise RuntimeError(
+            f"Credencial '{key}' não encontrada. Configure no arquivo .env "
+            f"ou nos Secrets do Streamlit."
+        ) from exc
+
 
 @st.cache_resource
 def get_client() -> Client:
-    return create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
+    return create_client(_credential("SUPABASE_URL"), _credential("SUPABASE_KEY"))
 
 
 def email_already_registered(email: str) -> bool:
