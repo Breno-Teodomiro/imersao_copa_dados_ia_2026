@@ -1,8 +1,12 @@
 # ⚽ Bolão Copa do Mundo 2026
 
+[![Acessar o app](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://imersaocopadadosia2026.streamlit.app/)
+
 Aplicação web de bolão da Copa do Mundo FIFA 2026, construída em **Python + Streamlit** com persistência em **Supabase (PostgreSQL)**. O participante faz seus palpites desde a fase de grupos até a grande final, com visual premium e bandeiras reais de todas as 48 seleções.
 
 > Projeto de portfólio — Imersão Jornada de Dados.
+
+🔗 **App online:** **[imersaocopadadosia2026.streamlit.app](https://imersaocopadadosia2026.streamlit.app/)**
 
 ---
 
@@ -73,6 +77,8 @@ A aplicação abre em `http://localhost:8501`.
 ---
 
 ## ☁️ Deploy (Streamlit Community Cloud)
+
+> ✅ **Já no ar:** [imersaocopadadosia2026.streamlit.app](https://imersaocopadadosia2026.streamlit.app/)
 
 1. Acesse [share.streamlit.io](https://share.streamlit.io) e faça login com o GitHub
 2. **Create app** → selecione este repositório, branch `main`, arquivo `app.py`
