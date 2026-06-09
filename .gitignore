@@ -7,3 +7,9 @@ dist/
 build/
 .venv/
 venv/
+
+# Claude Code / skills (config local)
+.claude/
+.agents/
+.mcp.json
+skills-lock.json
